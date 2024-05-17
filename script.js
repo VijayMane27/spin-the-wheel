@@ -5,7 +5,6 @@ const pressBtn = document.querySelector(".pointer span");
 const banner = document.querySelector(".banner");
 const infoText = document.querySelector(".info-text");
 const iconGroup = document.querySelector(".icon-group");
-const reciever = document.querySelector(".info-result h3");
 const selectedPresent = document.querySelector("#selected-present");
 const btn_reset = document.querySelector("#btn-reset");
 
@@ -27,9 +26,9 @@ const types = {
   },
 };
 const gradientColors = {
-  "25₹": ["#F7819F", "#FFA07A"], // Pink gradient for "25₹"
-  "50₹": ["#5EB5F6", "#87CEFA"], // Blue gradient for "50₹"
-  "😔": ["#FF6F61", "#FFD700"], // Red gradient for "😔"
+  "25₹": ["#F7819F", "#FFA07A"],
+  "50₹": ["#5EB5F6", "#87CEFA"],
+  "😔": ["#FF6F61", "#FFD700"],
 };
 const colors = {
   blueDark: "#1F1172",
@@ -38,7 +37,7 @@ const colors = {
 // init canvas setting
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-const radius = 270;
+const radius = 380;
 const PI2 = Math.PI * 2;
 canvas.width = radius * 2;
 canvas.height = radius * 2;
@@ -70,7 +69,7 @@ function insertContent(data, qty) {
   iconGroup.innerHTML = "";
   data.forEach((item, index) => {
     let html = `
-    <h5 style="font-size: 30px; position: absolute; left: 20px; bottom: 150px;">${item.label}</h5>
+    <h5 style="font-size: 60px; position: absolute; left: 60px; bottom: 200px;">${item.label}</h5>
   `;
     let newContent = document.createElement("li");
     newContent.innerHTML = html;
@@ -128,24 +127,25 @@ window.addEventListener("load", () => {
 });
 
 pressBtn.addEventListener("click", () => {
-  game.spinWheel();
-  game.isTurning = true; // prevent clicking before it stops
+  if (!game.isTurning) {
+    game.spinWheel();
+    game.isTurning = true;
+  }
 });
 
 pointer.addEventListener("transitionend", () => {
   pointer.style.transition = "none";
-  let actualDeg = game.deg - 3600;
-  game.deg = actualDeg;
+  let actualDeg = game.deg % 360;
   pointer.style.transform = `rotate(${actualDeg}deg)`;
   game.isTurning = false;
   game.showResult();
 });
 
-// Init Game object
 const Game = function (dataBase) {
   this.pool = [...dataBase];
-  this.presentQty = dataBase.length; // define the num of sectors
+  this.presentQty = dataBase.length;
   this.isTurning = false;
+  this.deg = 0;
   this.currentResult = {
     index: null,
     label: null,
@@ -153,34 +153,28 @@ const Game = function (dataBase) {
 };
 
 Game.prototype.spinWheel = function () {
-  if (this.isTurning) return; // no spinning while already turning
-
   this.getPresent();
-  let index = data.findIndex((x) => x.label === `${this.currentResult.label}`);
-  this.deg = (index * 360) / this.presentQty + 3600;
-  banner.style.display = "none";
-  pointer.style.transform = `rotate(${this.deg}deg)`;
-  pointer.style.transition = "all 3s ease-out";
+  let randomDeg = 360 * 5 + (360 / this.pool.length) * this.currentResult.index;
+  this.deg = randomDeg;
+  pointer.style.transition = "transform 5s ease-out";
+  pointer.style.transform = `rotate(${randomDeg}deg)`;
 };
 
 Game.prototype.showResult = function () {
-  var banner = document.querySelector(".banner");
-  var infoText = document.querySelector(".banner .info-text");
-  var selectedPresent = document.getElementById("selected-present");
+  let segmentAngle = 360 / this.presentQty;
+  let segmentIndex = Math.floor((this.deg % 360) / segmentAngle);
+  let resultLabel = this.pool[segmentIndex].label;
 
-  if (this.currentResult.label === "😔") {
-    // Display "Better luck next time!" in the banner
-    banner.style.display = "block";
+  banner.style.display = "block";
+  if (resultLabel === "😔") {
     infoText.innerText = "Better luck next time!";
     selectedPresent.innerText = "";
   } else {
-    // Display the result and confetti
-    banner.style.display = "block";
-    infoText.innerText = "congratulation";
-    selectedPresent.innerText = this.currentResult.label;
+    infoText.innerText = "Congratulations!";
+    selectedPresent.innerText = resultLabel;
 
     confetti({
-      particleCount: 500,
+      particleCount: 700,
       spread: 200,
       origin: { y: 0.3 },
       shapes: ["star", "circle", "square"],
@@ -188,13 +182,13 @@ Game.prototype.showResult = function () {
   }
 };
 
-function closeBanner() {
-  var banner = document.querySelector(".banner");
-  banner.style.display = "none";
-}
-
 Game.prototype.getPresent = function () {
   let index = Math.floor(Math.random() * this.pool.length);
   this.currentResult.label = this.pool[index].label;
   this.currentResult.index = index;
 };
+
+function closeBanner() {
+  var banner = document.querySelector(".banner");
+  banner.style.display = "none";
+}
