@@ -93,20 +93,22 @@ ul li {
 }
 
 .banner .info-text {
-  font-size: 65px;
+  font-size: 70px;
   margin-bottom: 20px;
   margin-top: 150px;
   width: 100%;
 }
 
 .banner .info-result {
-  font-size: 64px;
+  font-size: 200px;
+  margin-top: 70px;
   margin-bottom: 20px;
+  font-family: "Rampart", sans-serif; /* Added font-family */
 }
 
 .banner .close-button {
   display: inline-block;
-  margin-top: 50px;
+  margin-top: 200px;
   margin-left: 10px;
   padding: 10px 20px;
   font-size: 40px;

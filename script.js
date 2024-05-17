@@ -176,7 +176,7 @@ Game.prototype.showResult = function () {
     confetti({
       particleCount: 700,
       spread: 200,
-      origin: { y: 0.3 },
+      origin: { y: 0.2 },
       shapes: ["star", "circle", "square"],
     });
   }
