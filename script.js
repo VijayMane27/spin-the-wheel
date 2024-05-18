@@ -42,6 +42,9 @@ const PI2 = Math.PI * 2;
 canvas.width = radius * 2;
 canvas.height = radius * 2;
 
+// Create and load the audio element
+const spinAudio = new Audio("wheel-audio.mp3");
+
 // draw sectors with gradient
 ctx.fillPie = function (x, y, r, start, qty, gradient) {
   let angle = PI2 / qty;
@@ -130,6 +133,7 @@ pressBtn.addEventListener("click", () => {
   if (!game.isTurning) {
     game.spinWheel();
     game.isTurning = true;
+    spinAudio.play();
   }
 });
 
@@ -139,6 +143,8 @@ pointer.addEventListener("transitionend", () => {
   pointer.style.transform = `rotate(${actualDeg}deg)`;
   game.isTurning = false;
   game.showResult();
+  spinAudio.pause();
+  spinAudio.currentTime = 0; // Reset the audio for the next spin
 });
 
 const Game = function (dataBase) {
